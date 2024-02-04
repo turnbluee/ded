@@ -1,20 +1,21 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
+#include <locale.h>
+#include <wchar.h>
 
-int MallIn(char** a, int x, int y) {
+int MallIn(wchar_t** a, int x, int y) {
 
     FILE* in;
     in = fopen("input.txt", "r");
     int c = 0, i = 0, j = 0;
-    char k = fgetc(in);
+    wchar_t k = fgetwc(in);
 
-    while (k != EOF) {
-        while (k != '\n' && k != EOF) {
+    while (k != WEOF) {
+        while (k != '\n' && k != WEOF) {
             *(*a + x * i + j) = k;
             ++j;
-            k = fgetc(in);
+            k = fgetwc(in);
         }
 
         for (; j < x; ++j) {
@@ -23,25 +24,25 @@ int MallIn(char** a, int x, int y) {
 
         if (i == y - 1) {
             y *= 2;
-            *a = (char*)realloc(*a, y * x);
+            *a = (wchar_t*)realloc(*a, y * x * sizeof(wchar_t));
         }
 
         ++i;
         j = 0;
-        k = fgetc(in);
+        k = fgetwc(in);
     }
     fclose(in);
 
     return i;
 }
 
-void MallSort(char** a, int x, int y) {
+void MallSort(wchar_t** a, int x, int y) {
 
     for (int i = 1; i < y; ++i) {
 
         int count = 0, l = i - 1, j = 0;
         
-        while (*(*a + x * i + j) <= *(*a + x * l + j) && l >= 0) {
+        while (l >= 0 && *(*a + x * i + j) <= *(*a + x * l + j)) {
 
             if (*(*a + x * i + j) == *(*a + x * l + j)) {
                 ++j;
@@ -55,13 +56,10 @@ void MallSort(char** a, int x, int y) {
             }
         }
 
-        char* str = (char*)malloc(x + 1);
+        wchar_t* str = (wchar_t*)malloc((x + 1) * sizeof(wchar_t));
         for (j = 0; j < x; ++j) {
             *(str + j) = *(*a + x * i + j);
         }
-        
-        char* cur_str = (char*)malloc(x);
-
 
         l = i;
         while (count != 0) {
@@ -80,23 +78,14 @@ void MallSort(char** a, int x, int y) {
     }
 }
 
-
-
-/*
-
-A
-AA
-AB
-*/
-
-void MallOut(char** a, int x, int y) {
+void MallOut(wchar_t** a, int x, int y) {
     FILE* out = fopen("output.txt", "w");
 
     int j = 0;
-    char k = '\n';
+    wchar_t k = '\n';
     for (int i = 0; i < y; ++i) {
         while (j < x && *(*a + x * i + j) != k) {
-            putc(*(*a + x * i + j), out);
+            fputwc(*(*a + x * i + j), out);
             ++j;
         }
         j = 0;
@@ -110,12 +99,10 @@ void MallOut(char** a, int x, int y) {
 }
 
 int main() {
+    setlocale(LC_ALL, "");
 
-    std::setlocale(LC_ALL, "RU");
-    
     int y = 100, x = 100;
-    char* a;
-    a = (char*)malloc(y * x);
+    wchar_t* a = (wchar_t*)malloc(y * x * sizeof(wchar_t));
     
     y = MallIn(&a, x, y);
 
