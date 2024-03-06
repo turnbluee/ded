@@ -1,4 +1,4 @@
-﻿#include "Header.h"
+﻿#include "ServFuncHead.h"
 
 Arr* Constr(int max_x, int max_y) {
     Arr* ptrArr = (Arr*)malloc(sizeof(Arr));
@@ -13,7 +13,7 @@ Arr* Constr(int max_x, int max_y) {
 int ArrIn(Arr* ptrArr) {
 
     FILE* in;
-    in = fopen("input1.txt", "r");
+    in = fopen("input.txt", "r");
     int c = 0, i = 0, j = 0;
     wchar_t k = fgetwc(in);
 

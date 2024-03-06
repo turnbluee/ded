@@ -1,4 +1,4 @@
-﻿#include "Header.h"
+﻿#include "ServFuncHead.h"
 
 int main() {
 
@@ -10,7 +10,7 @@ int main() {
 
     ptrArr->max_y = ArrIn(ptrArr);
 
-    //ArrInsSort(ptrArr);
+    ArrInsSort(ptrArr);
     StrProc(ptrArr, 2, 3);
     ArrOut(ptrArr);
 
