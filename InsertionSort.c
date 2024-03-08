@@ -76,6 +76,7 @@ void ArrInsSort(Arr* ptrArr) {
                 break;
             }
         }
+        ++StrNumPrev;
 
         wchar_t* str = StrCopy(ptrArr, StrNumNow);
 
@@ -84,5 +85,7 @@ void ArrInsSort(Arr* ptrArr) {
         }
 
         StrPaste(ptrArr, StrNumPrev, &str);
+
+        free(str);
     }
 }

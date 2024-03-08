@@ -14,7 +14,4 @@ int main() {
     ArrOut(ptrArr);
 
     Destr(ptrArr);
-
-    int a = 'А';
-    printf(" %d ", a);
 }

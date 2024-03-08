@@ -1,5 +1,5 @@
 ﻿#ifndef _HEADER_H_
-#define HEADER_H_
+#define _HEADER_H_
 #define _CRT_SECURE_NO_WARNINGS
 #define MAX_X 100
 #define ZERO 0
