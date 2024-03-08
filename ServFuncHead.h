@@ -31,4 +31,9 @@ void StrProc(Arr* ptrArr, int StrNum1, int StrNum2);
 
 void ArrInsSort(Arr* ptrArr);
 
+wchar_t* StrCopy(Arr* ptrArr, int StrNum);
+
+void StrPaste(Arr* ptrArr, int StrNum, wchar_t* str);
+
+
 #endif _HEADER_H_

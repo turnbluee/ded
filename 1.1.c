@@ -11,8 +11,10 @@ int main() {
     ptrArr->max_y = ArrIn(ptrArr);
 
     ArrInsSort(ptrArr);
-    StrProc(ptrArr, 2, 3);
     ArrOut(ptrArr);
 
     Destr(ptrArr);
+
+    int a = 'А';
+    printf(" %d ", a);
 }

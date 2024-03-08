@@ -66,8 +66,29 @@ void Destr(Arr* ptrAll) {
     free(ptrAll);
 }
 
-/*
-* ОГРАНИЧЕНИЕ: StrNum1 < StrNum2
+wchar_t* StrCopy(Arr* ptrArr, int StrNum) {
+
+    if (StrNum < 0 || StrNum >= ptrArr->max_y) {
+        return NULL;
+    }
+
+    int i = 0;
+    wchar_t* str = (wchar_t*)malloc(sizeof(wchar_t) * ptrArr->max_x);
+    if (str == NULL) {
+        return NULL;
+    }
+
+    while (ptrArr->arr[ptrArr->max_x * StrNum + i] != '\0' && i < ptrArr->max_x - 1) {
+        str[i] = ptrArr->arr[ptrArr->max_x * StrNum + i];
+        ++i;
+    }
+    str[i] = '\0';
+    
+    return str;
+}
+
+/* 
+* ОГРАНИЧЕНИЕ: StrNum1 < StrNum2 
 
 * если одинаковый символ, то увеличиваем позицию, если строки равны
 возвращаем 0
@@ -86,23 +107,31 @@ int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
     int j = 0;
 
     while (1) {
-        if (ptrArr->arr[ptrArr->max_x * StrNum1 + j] == ptrArr->arr[ptrArr->max_x * StrNum2 + j]) {
-            if (ptrArr->arr[ptrArr->max_x * StrNum1 + j] == '\0' &&
-                ptrArr->arr[ptrArr->max_x * StrNum2 + j] == '\0') {
+        wchar_t Str1 = ptrArr->arr[ptrArr->max_x * StrNum1 + j];
+        wchar_t Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + j];
+
+        if ('А' < Str1 && Str1 < 'Я')
+        {
+            Str1 += 32;
+        }
+
+        if ('А' < Str2 && Str2 < 'Я')
+        {
+            Str2 += 32;
+        }
+
+        if (Str1 == Str2) {
+            if (Str1 == '\0' && Str2 == '\0') {
                 return 0;
             }
             ++j;
         }
 
-        if (ptrArr->arr[ptrArr->max_x * StrNum1 + j] < ptrArr->arr[ptrArr->max_x * StrNum2 + j] ||
-            ptrArr->arr[ptrArr->max_x * StrNum1 + j] == '\0' &&
-            ptrArr->arr[ptrArr->max_x * StrNum2 + j] != '\0') {
+        if (Str1 < Str2 || Str1 == '\0' && Str2 != '\0') {
             return 1;
         }
 
-        if (ptrArr->arr[ptrArr->max_x * StrNum1 + j] > ptrArr->arr[ptrArr->max_x * StrNum2 + j] ||
-            ptrArr->arr[ptrArr->max_x * StrNum1 + j] != '\0' &&
-            ptrArr->arr[ptrArr->max_x * StrNum2 + j] == '\0') {
+        if (Str1 > Str2 || Str1 != '\0' && Str2 == '\0') {
             return 2;
         }
     }
@@ -110,15 +139,7 @@ int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
 
 void StrSwap(Arr* ptrArr, int StrNum1, int StrNum2) {
     int i = 0, j = 0;
-    wchar_t* str = (wchar_t*)malloc((ptrArr->max_x + 1) * sizeof(wchar_t));
-    
-    while (ptrArr->arr[ptrArr->max_x * StrNum1 + i] != '\0') {
-        *(str + i) = ptrArr->arr[ptrArr->max_x * StrNum1 + i];
-        ptrArr->arr[ptrArr->max_x * StrNum1 + i] = '\0';
-        ++i;
-    }
-    *(str + i) = '\0';
-    i = j;
+    wchar_t* str = StrCopy(ptrArr, StrNum1);
 
     while (ptrArr->arr[ptrArr->max_x * StrNum2 + j] != '\0') {
         ptrArr->arr[ptrArr->max_x * StrNum1 + j] = ptrArr->arr[ptrArr->max_x * StrNum2 + j];
@@ -147,5 +168,13 @@ void StrProc(Arr* ptrArr, int StrNum1, int StrNum2) {
         StrSwap(ptrArr, StrNum1, StrNum2);
         printf("%s", "Second line is higher");
     }
+}
 
+void StrPaste(Arr* ptrArr, int StrNum, wchar_t *str) {
+    int i = 0;
+    while (str[i] != '\0' && i < ptrArr->max_x - 1) {
+        ptrArr->arr[ptrArr->max_x * StrNum + i] = str[i];
+        ++i;
+    }
+    ptrArr->arr[ptrArr->max_x * StrNum + i] = '\0';
 }

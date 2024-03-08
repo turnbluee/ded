@@ -1,6 +1,6 @@
 #include "ServFuncHead.h"
 
-void ArrInsSort(Arr* ptrArr) {
+void ArrInsSort1(Arr* ptrArr) {
 
     for (int i = 1; i < ptrArr->max_y; ++i) {
 
@@ -59,5 +59,30 @@ void ArrInsSort(Arr* ptrArr) {
         ptrArr->arr[ptrArr->max_x * l + j] = '\0';
 
         free(str);
+    }
+}
+
+void ArrInsSort(Arr* ptrArr) {
+    for (int StrNumNow = 1; StrNumNow < ptrArr->max_y; ++StrNumNow){
+        int count = 0, StrNumPrev = StrNumNow - 1, j = 0;
+
+        while (StrNumPrev >= 0) {
+            if (StrComp(ptrArr, StrNumPrev, StrNumNow) == 2) {
+                ++count;
+                --StrNumPrev;
+            }
+            else if (StrComp(ptrArr, StrNumPrev, StrNumNow) == 1 ||
+                StrComp(ptrArr, StrNumPrev, StrNumNow) == 0) {
+                break;
+            }
+        }
+
+        wchar_t* str = StrCopy(ptrArr, StrNumNow);
+
+        for (int i = 0; i < count; ++i) {
+            StrSwap(ptrArr, StrNumNow - i, StrNumNow - i - 1);
+        }
+
+        StrPaste(ptrArr, StrNumPrev, &str);
     }
 }
