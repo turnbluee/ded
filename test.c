@@ -8,11 +8,7 @@ int main() {
 
     Arr* ptrArr = Constr(MAX_X, max_y);
 
-    ptrArr->max_y = ArrIn(ptrArr);
-
-    if (ptrArr->max_y < 0) {
-        return -1488;
-    }
+    ArrIn(ptrArr);
 
     ArrOut(ptrArr);
 }

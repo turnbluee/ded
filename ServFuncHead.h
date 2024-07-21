@@ -16,8 +16,12 @@ typedef struct {
 
 Arr* Constr(int max_x, int max_y);
 
-int ArrIn(Arr* ptrArr);
+void ArrIn(Arr* ptrArr);
 
 void ArrOut(Arr* ptrArr);
+
+int CharCheck(unsigned char ch);
+
+int ArrExt(Arr* ptrArr);
 
 void Destr(Arr* ptrAll);

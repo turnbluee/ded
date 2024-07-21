@@ -3,8 +3,8 @@
 Arr* Constr(int max_x, int max_y) {
     Arr* ptrArr = (Arr*)malloc(sizeof(Arr));
 
-    if (!ptrArr) {
-        printf("Allocate error, ServFunc str7");
+    if (ptrArr == NULL) {
+        printf("Allocate error, ServFunc str7\n");
         return NULL;
     }
 
@@ -12,20 +12,19 @@ Arr* Constr(int max_x, int max_y) {
     ptrArr->max_y = max_y;
     ptrArr->arr = (int*)malloc(max_y * max_x * sizeof(int));
     
-    if (!ptrArr->arr) {
-        printf("Allocate error, ServFunc str15");
+    if (ptrArr->arr == NULL) {
+        printf("Allocate error, ServFunc str15\n");
         return NULL;
     }
 
     return ptrArr;
 }
 
-int ArrIn(Arr* ptrArr) {
+void ArrIn(Arr* ptrArr) {
     FILE* in;
     in = fopen("input.txt", "r");
-    if(in == NULL)
-    {
-        printf("Error occured while opening input.txt");
+    if(in == NULL) {
+        printf("Error occured while opening input.txt\n");
         return 1;
     }
     int row = 0, col = 0, curr_char = 0;
@@ -48,15 +47,15 @@ int ArrIn(Arr* ptrArr) {
     }
 
     if (feof(in)) {
-        printf("End of file");
+        printf("End of file\n");
     }
     else if (ferror(in)) {
-        printf("Reading file error, str36");
+        printf("Reading file error, str36\n");
         return -2;
     }
 
     fclose(in);
-    return row;
+    ptrArr->max_y = row;
 }
 
 int ArrExt(Arr* ptrArr) {
@@ -64,7 +63,7 @@ int ArrExt(Arr* ptrArr) {
     ptrArr->arr = (int*)realloc(ptrArr->arr,
         ptrArr->max_y * ptrArr->max_x * sizeof(int));
     if (ptrArr->arr == NULL) {
-        printf("Reallocation error");
+        printf("Reallocation error\n");
         return -1;
     }
     return 0;
@@ -81,20 +80,14 @@ int CharCheck(unsigned char ch) {
 
 void ArrOut(Arr* ptrArr) {
     FILE* out = fopen("output.txt", "wb");
-    printf("%i", ptrArr->max_y);
+    printf("%i\n", ptrArr->max_y);
+    int curr_num;
     for (int row = 0; row < ptrArr->max_y; ++row) {
-        int col = 0;
-        while (col < ptrArr->max_x && ptrArr->arr[ptrArr->max_x * row + col] != '\n') {
-            int curr_num = ptrArr->arr[ptrArr->max_x * row + col];
+        for (int col = 0; (curr_num = ptrArr->arr[ptrArr->max_x * row + col]) != '\n'; ++col) {
             unsigned char curr_char = (char)curr_num;
-            fputc(curr_num, out);
-            ++col;
-            fputc(col, out);
+            fputc(curr_char, out);
         }
-
-        if (row != ptrArr->max_y - 1) {
-            fputc('\n', out);
-        }
+        fputc('\n', out);
     }
 
     fclose(out);
