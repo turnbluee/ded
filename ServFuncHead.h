@@ -1,5 +1,4 @@
-﻿#ifndef _HEADER_H_
-#define _HEADER_H_
+﻿#define _HEADER_H_
 #define _CRT_SECURE_NO_WARNINGS
 #define MAX_X 100
 #define ZERO 0
@@ -12,7 +11,7 @@
 
 typedef struct {
     int max_x, max_y;
-    wchar_t* arr;
+    int* arr;
 } Arr;
 
 Arr* Constr(int max_x, int max_y);
@@ -22,18 +21,3 @@ int ArrIn(Arr* ptrArr);
 void ArrOut(Arr* ptrArr);
 
 void Destr(Arr* ptrAll);
-
-int StrComp(Arr* ptrArr, int StrNum1, int StrNum2);
-
-void StrSwap(Arr* ptrArr, int StrNum1, int StrNum2);
-
-void StrProc(Arr* ptrArr, int StrNum1, int StrNum2);
-
-void ArrInsSort(Arr* ptrArr);
-
-wchar_t* StrCopy(Arr* ptrArr, int StrNum);
-
-void StrPaste(Arr* ptrArr, int StrNum, wchar_t* str);
-
-
-#endif _HEADER_H_
