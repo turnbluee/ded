@@ -4,6 +4,12 @@
 #define ZERO 0
 #define FIRST 1
 #define SECOND 2
+#define EOL 10 // узнал только исходя из отслеживания, никак иначе не удалось
+#define SPACE 32
+#define rus_A 192
+#define rus_R 223
+#define rus_a 224
+#define rus_r 255
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -16,7 +22,7 @@ typedef struct {
 
 Arr* Constr(int max_x, int max_y);
 
-void ArrIn(Arr* ptrArr);
+int ArrIn(Arr* ptrArr);
 
 void ArrOut(Arr* ptrArr);
 
@@ -25,3 +31,15 @@ int CharCheck(unsigned char ch);
 int ArrExt(Arr* ptrArr);
 
 void Destr(Arr* ptrAll);
+
+int* StrCopy(Arr* ptrArr, int StrNum);
+
+int StrComp(Arr* ptrArr, int StrNum1, int StrNum2);
+
+void StrSwap(Arr* ptrArr, int StrNum1, int StrNum2);
+
+void StrProc(Arr* ptrArr, int StrNum1, int StrNum2);
+
+void StrPaste(Arr* ptrArr, int StrNum, char* str);
+
+void ArrInsSort(Arr* ptrArr);

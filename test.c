@@ -10,5 +10,7 @@ int main() {
 
     ArrIn(ptrArr);
 
+    ArrInsSort(ptrArr);
+
     ArrOut(ptrArr);
 }
