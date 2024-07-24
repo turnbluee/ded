@@ -97,6 +97,7 @@ void Destr(Arr* ptrAll) {
     free(ptrAll);
 }
 
+
 /*
 * ОГРАНИЧЕНИЕ: StrNum1 < StrNum2
 
@@ -117,41 +118,59 @@ int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
     int col1 = 0, col2 = 0;
 
     while (1) {
-        float Str1 = ptrArr->arr[ptrArr->max_x * StrNum1 + col1];
-        float Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
-        
+        int Str1 = ptrArr->arr[ptrArr->max_x * StrNum1 + col1];
+        int Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
+        int small1 = 0, small2 = 0;
+
         if ((Str1 == '"' || Str1 == '(') && col1 == 0) {
             ++col1;
             Str1 = ptrArr->arr[ptrArr->max_x * StrNum1 + col1];
         }
-
-        if (rus_A <= Str1 && Str1 <= rus_R) {
-            Str1 -= 0.5;
+        if ((Str2 == '"' || Str2 == '(') && col2 == 0) {
+            ++col2;
+            Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
         }
-        else if (rus_a <= Str1 && Str1 <= rus_r) {
+
+
+        if (Str1 == Str2 - 32) {
+            small2 = 1;
+        }
+        else if (Str2 == Str1 - 32) {
+            small1 = 1;
+        }
+
+        
+        if (rus_a <= Str1 && Str1 <= rus_r) {
             Str1 -= 32;
         }
         else if (!(rus_A <= Str1 && Str1 <= rus_r)) {
             Str1 = 256;
         }
-        
-        
-        if ((Str2 == '"' || Str2 == '(') && col2 == 0) {
-            ++col2;
-            Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
-        }
-        
-        if (rus_A <= Str2 && Str2 <= rus_R) {
-            Str2 -= 0.5;
-        }
-        else if (rus_a <= Str2 && Str2 <= rus_r) {
+
+        if (rus_a <= Str2 && Str2 <= rus_r) {
             Str2 -= 32;
         }
         else if (!(rus_A <= Str2 && Str2 <= rus_r)) {
             Str2 = 256;
         }
+        
+        /* не знаю почему, но закомментированный метод сравнения с символами не работает
+        if ((int)'а' <= Str1 && Str1 <= (int)'я') {
+            Str1 -= 32;
+        }
+        else if (!((int)'А' <= Str1 && Str1 <= (int)'я')) {
+            Str1 = 256;
+        }
 
-        if (Str1 == Str2) {
+        if ((int)'а' <= Str2 && Str2 <= (int)'я') {
+            Str2 -= 32;
+        }
+        else if (!((int)'А' <= Str2 && Str2 <= (int)'я')) {
+            Str2 = 256;
+        }
+        */
+
+        if (Str1 == Str2 && (small1 == 0 && small2 == 0 || small1 != 0 && small2 != 0)) {
             if (Str2 == 256) {
                 return 0;
             }
@@ -159,11 +178,11 @@ int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
             ++col2;
         }
 
-        if (Str1 < Str2 || Str1 != 256 && Str2 == 256) {
+        if (Str1 < Str2 || Str1 != 256 && Str2 == 256 || small2 == 1) {
             return 1;
         }
 
-        if (Str1 > Str2 || Str1 == 256 && Str2 != 256) {
+        if (Str1 > Str2 || Str1 == 256 && Str2 != 256 || small1 == 1) {
             return 2;
         }
     }

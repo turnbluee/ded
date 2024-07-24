@@ -26,8 +26,6 @@ int ArrIn(Arr* ptrArr);
 
 void ArrOut(Arr* ptrArr);
 
-int CharCheck(unsigned char ch);
-
 int ArrExt(Arr* ptrArr);
 
 void Destr(Arr* ptrAll);
