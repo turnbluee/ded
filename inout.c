@@ -20,7 +20,7 @@ Arr* Constr(int max_x, int max_y) {
     return ptrArr;
 }
 
-int ArrIn(Arr* ptrArr) {
+void ArrIn(Arr* ptrArr) {
     FILE* in;
     in = fopen("input.txt", "r");
     if (in == NULL) {

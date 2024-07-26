@@ -20,9 +20,19 @@ typedef struct {
     int* arr;
 } Arr;
 
+static char* ErrorNames[] = {
+    "Index out of range",
+    "Allocation error"
+};
+
+enum Errors {
+    INDEX_OUT_OF_RANGE = 1,
+    ALLOCATION_ERROR
+};
+
 Arr* Constr(int max_x, int max_y);
 
-int ArrIn(Arr* ptrArr);
+void ArrIn(Arr* ptrArr);
 
 void ArrOut(Arr* ptrArr);
 
@@ -38,6 +48,6 @@ void StrSwap(Arr* ptrArr, int StrNum1, int StrNum2);
 
 void StrProc(Arr* ptrArr, int StrNum1, int StrNum2);
 
-void StrPaste(Arr* ptrArr, int StrNum, char* str);
+void StrPaste(Arr* ptrArr, int StrNum, int* str);
 
 void ArrInsSort(Arr* ptrArr);
