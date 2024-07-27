@@ -25,7 +25,8 @@ enum ErrorCodes {
     INDEX_OUT_OF_RANGE = 1,
     ALLOCATION_ERROR,
     REALLOCATION_ERROR,
-    READING_FILE_ERROR
+    READING_FILE_ERROR,
+    OPEN_FILE_ERROR
 };
 
 extern const char* ErrorNames[];
@@ -34,13 +35,11 @@ Arr* Constr(int max_x, int max_Sy);
 
 void ArrIn(Arr* ptrArr);
 
-void ArrOut(Arr* ptrArr);
-
 void ArrExt(Arr* ptrArr);
 
-void Destr(Arr* ptrAll);
+void ArrOut(Arr* ptrArr);
 
-int* StrCopy(Arr* ptrArr, int StrNum);
+void Destr(Arr* ptrAll);
 
 int StrComp(Arr* ptrArr, int StrNum1, int StrNum2);
 
@@ -48,8 +47,10 @@ void StrSwap(Arr* ptrArr, int StrNum1, int StrNum2);
 
 void StrProc(Arr* ptrArr, int StrNum1, int StrNum2);
 
+int* StrCopy(Arr* ptrArr, int StrNum);
+
 void StrPaste(Arr* ptrArr, int StrNum, int* str);
 
-void ArrInsSort(Arr* ptrArr);
-
 void ErrorProc (int ErrorCode);
+
+void ArrInsSort(Arr* ptrArr);

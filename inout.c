@@ -24,7 +24,7 @@ void ArrIn(Arr* ptrArr) {
     FILE* in;
     in = fopen("input.txt", "r");
     if (in == NULL) {
-        ErrorProc(ALLOCATION_ERROR);
+        ErrorProc(OPEN_FILE_ERROR);
     }
     int row = 0, col = 0, curr_char = 0;
 
@@ -246,5 +246,5 @@ void StrPaste(Arr* ptrArr, int StrNum, int* str) {
 
 void ErrorProc (int ErrorCode) {
     printf("%s", ErrorNames[ErrorCode - 1]);
-    EXIT_FAILURE;
+    exit(ErrorCode - 1);
 }

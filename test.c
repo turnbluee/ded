@@ -3,7 +3,8 @@
     "Index Out Of Range",
     "Allocation Error",
     "Reallocation Error",
-    "Reading File Error"
+    "Reading File Error",
+    "Open File Error"
     };
 
 int main() {
