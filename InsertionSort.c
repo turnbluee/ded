@@ -125,6 +125,6 @@ void ArrInsSort(Arr* ptrArr) {
     }
 }
 
-void ArrBubbleSort(Arr* ptrArr) {
-    for (int counter)
-}
+// void ArrBubbleSort(Arr* ptrArr) {
+//     for (int counter)
+// }

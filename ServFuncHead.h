@@ -14,29 +14,29 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <wchar.h>
+#include <string.h>
 
 typedef struct {
     int max_x, max_y;
     int* arr;
 } Arr;
 
-static char* ErrorNames[] = {
-    "Index out of range",
-    "Allocation error"
-};
-
-enum Errors {
+enum ErrorCodes {
     INDEX_OUT_OF_RANGE = 1,
-    ALLOCATION_ERROR
+    ALLOCATION_ERROR,
+    REALLOCATION_ERROR,
+    READING_FILE_ERROR
 };
 
-Arr* Constr(int max_x, int max_y);
+extern const char* ErrorNames[];
+
+Arr* Constr(int max_x, int max_Sy);
 
 void ArrIn(Arr* ptrArr);
 
 void ArrOut(Arr* ptrArr);
 
-int ArrExt(Arr* ptrArr);
+void ArrExt(Arr* ptrArr);
 
 void Destr(Arr* ptrAll);
 
@@ -51,3 +51,5 @@ void StrProc(Arr* ptrArr, int StrNum1, int StrNum2);
 void StrPaste(Arr* ptrArr, int StrNum, int* str);
 
 void ArrInsSort(Arr* ptrArr);
+
+void ErrorProc (int ErrorCode);

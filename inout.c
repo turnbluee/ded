@@ -1,11 +1,12 @@
 #include "ServFuncHead.h"
+#include "stdlib.h"
+#include "stdio.h"
 
 Arr* Constr(int max_x, int max_y) {
     Arr* ptrArr = (Arr*)malloc(sizeof(Arr));
 
     if (ptrArr == NULL) {
-        printf("Allocate error, ServFunc str7\n");
-        return NULL;
+        ErrorProc(ALLOCATION_ERROR);
     }
 
     ptrArr->max_x = max_x;
@@ -13,8 +14,7 @@ Arr* Constr(int max_x, int max_y) {
     ptrArr->arr = (int*)malloc(max_y * max_x * sizeof(int));
     
     if (ptrArr->arr == NULL) {
-        printf("Allocate error, ServFunc str15\n");
-        return NULL;
+        ErrorProc(ALLOCATION_ERROR);
     }
 
     return ptrArr;
@@ -24,17 +24,13 @@ void ArrIn(Arr* ptrArr) {
     FILE* in;
     in = fopen("input.txt", "r");
     if (in == NULL) {
-        printf("Error occured while opening input.txt\n");
-        return 1;
+        ErrorProc(ALLOCATION_ERROR);
     }
     int row = 0, col = 0, curr_char = 0;
 
     while ((curr_char = getc(in)) != EOF) {
         if (row == ptrArr->max_y - 1) {
-            int res = ArrExt(ptrArr);
-            if (res == -1) {
-                return -1;
-            }
+            ArrExt(ptrArr);
         }
 
         ptrArr->arr[ptrArr->max_x * row + col] = curr_char;
@@ -48,30 +44,27 @@ void ArrIn(Arr* ptrArr) {
 
     if (feof(in)) {
         ptrArr->arr[ptrArr->max_x * row + col] = '\n';
-        printf("End of file\n");
+        //printf("End of file\n");
     }
     else if (ferror(in)) {
-        printf("Reading file error, str36\n");
-        return -2;
+        ErrorProc(READING_FILE_ERROR);
     }
 
     fclose(in);
     ptrArr->max_y = row + 1;
 }
 
-int ArrExt(Arr* ptrArr) {
+void ArrExt(Arr* ptrArr) {
     ptrArr->max_y *= 2;
     ptrArr->arr = (int*)realloc(ptrArr->arr,
         ptrArr->max_y * ptrArr->max_x * sizeof(int));
     if (ptrArr->arr == NULL) {
-        printf("Reallocation error\n");
-        return -1;
+        ErrorProc(REALLOCATION_ERROR);
     }
-    return 0;
 }
 
 void ArrOut(Arr* ptrArr) {
-    FILE* out = fopen("output.txt", "wb");
+    FILE* out = fopen("output.txt", "w");
     printf("%i\n", ptrArr->max_y);
     int curr_num;
     for (int row = 0; row < ptrArr->max_y; ++row) {
@@ -99,20 +92,20 @@ void Destr(Arr* ptrAll) {
 
 
 /*
-* ОГРАНИЧЕНИЕ: StrNum1 < StrNum2
+* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: StrNum1 < StrNum2
 
-* если одинаковый символ, то увеличиваем позицию, если строки равны
-возвращаем 0
+* пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0
 
-* если символы строки1 совпадают с строкой2 и встречен символ из строки1,
-стоящий по алфавиту ВЫШЕ, чем символ строки2 или строка1 совпадает
-со строкой2 и при этом КОРОЧЕ неё, то НЕ МЕНЯЕМ местами
-возвращаем 1
+* пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1,
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1
 
-* если символы строки1 совпадают с строкой2 и встречен символ из строки1,
-стоящий по алфавиту НИЖЕ, чем символ строки2 или строка1 совпадает
-со строкой2 и при этом ДЛИННЕЕ неё, то МЕНЯЕМ местами
-возвращаем 2
+* пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1,
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2
 */
 int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
     int col1 = 0, col2 = 0;
@@ -154,18 +147,18 @@ int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
             Str2 = 256;
         }
         
-        /* не знаю почему, но закомментированный метод сравнения с символами не работает
-        if ((int)'а' <= Str1 && Str1 <= (int)'я') {
+        /* пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+        if ((int)'пїЅ' <= Str1 && Str1 <= (int)'пїЅ') {
             Str1 -= 32;
         }
-        else if (!((int)'А' <= Str1 && Str1 <= (int)'я')) {
+        else if (!((int)'пїЅ' <= Str1 && Str1 <= (int)'пїЅ')) {
             Str1 = 256;
         }
 
-        if ((int)'а' <= Str2 && Str2 <= (int)'я') {
+        if ((int)'пїЅ' <= Str2 && Str2 <= (int)'пїЅ') {
             Str2 -= 32;
         }
-        else if (!((int)'А' <= Str2 && Str2 <= (int)'я')) {
+        else if (!((int)'пїЅ' <= Str2 && Str2 <= (int)'пїЅ')) {
             Str2 = 256;
         }
         */
@@ -249,4 +242,9 @@ void StrPaste(Arr* ptrArr, int StrNum, int* str) {
         ++curr_pos;
     }
     ptrArr->arr[ptrArr->max_x * StrNum + curr_pos] = '\n';
+}
+
+void ErrorProc (int ErrorCode) {
+    printf("%s", ErrorNames[ErrorCode - 1]);
+    EXIT_FAILURE;
 }
