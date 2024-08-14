@@ -2,11 +2,11 @@
 #include "stdlib.h"
 #include "stdio.h"
 
-Arr* Constr(int max_x, int max_y) {
-    Arr* ptrArr = (Arr*)malloc(sizeof(Arr));
+Arr* Constr(const int max_x, const int max_y) {
+    Arr* ptrArr = malloc(sizeof(Arr));
 
     if (ptrArr == NULL) {
-        ErrorProc(ALLOCATION_ERROR);
+        return NULL;
     }
 
     ptrArr->max_x = max_x;
@@ -14,23 +14,25 @@ Arr* Constr(int max_x, int max_y) {
     ptrArr->arr = (int*)malloc(max_y * max_x * sizeof(int));
     
     if (ptrArr->arr == NULL) {
-        ErrorProc(ALLOCATION_ERROR);
+        return NULL;
     }
 
     return ptrArr;
 }
 
-void ArrIn(Arr* ptrArr) {
-    FILE* in;
-    in = fopen("input.txt", "r");
+int ArrIn(Arr* ptrArr) {
+    FILE* in = fopen("input.txt", "r");
     if (in == NULL) {
-        ErrorProc(OPEN_FILE_ERROR);
+        return OPENING_FILE_ERROR;
     }
-    int row = 0, col = 0, curr_char = 0;
+    int row = 0, col = 0, curr_char = EOF;
 
     while ((curr_char = getc(in)) != EOF) {
         if (row == ptrArr->max_y - 1) {
             ArrExt(ptrArr);
+            if (ptrArr->arr == NULL) {
+                return ALLOCATION_ERROR;
+            }
         }
 
         ptrArr->arr[ptrArr->max_x * row + col] = curr_char;
@@ -44,52 +46,63 @@ void ArrIn(Arr* ptrArr) {
 
     if (feof(in)) {
         ptrArr->arr[ptrArr->max_x * row + col] = '\n';
-        //printf("End of file\n");
+        printf("End of file\n");
     }
     else if (ferror(in)) {
-        ErrorProc(READING_FILE_ERROR);
+        return READING_FILE_ERROR;
     }
 
     fclose(in);
     ptrArr->max_y = row + 1;
+    return 0;
 }
 
-void ArrExt(Arr* ptrArr) {
+int ArrExt(Arr* ptrArr) {
     ptrArr->max_y *= 2;
     ptrArr->arr = (int*)realloc(ptrArr->arr,
         ptrArr->max_y * ptrArr->max_x * sizeof(int));
     if (ptrArr->arr == NULL) {
-        ErrorProc(REALLOCATION_ERROR);
+        return ALLOCATION_ERROR;
     }
+    return 0;
 }
 
-void ArrOut(Arr* ptrArr) {
+int ArrOut(Arr* ptrArr) {
     FILE* out = fopen("output.txt", "w");
+    if (out == NULL) {
+        return OPENING_FILE_ERROR;
+    }
     printf("%i\n", ptrArr->max_y);
     int curr_num;
     for (int row = 0; row < ptrArr->max_y; ++row) {
         for (int col = 0; (curr_num = ptrArr->arr[ptrArr->max_x * row + col]) != '\n' && col < MAX_X; ++col) {
             unsigned char curr_char;
-            if (curr_num == 256) {
+            if (curr_num == NON_LETTER_SYMBOL) {
                 curr_char = ' ';
             }
             else {
-               curr_char = curr_num;
+                curr_char = curr_num;
             }
-            fputc(curr_char, out);
+            const unsigned char res = fputc(curr_char, out);
+            if (res == EOF) {
+                return WRITING_FILE_ERROR;
+            }
         }
-        fputc('\n', out);
+        const char res = fputc('\n', out);
+        if (res == EOF) {
+            return WRITING_FILE_ERROR;
+        }
     }
 
     fclose(out);
     Destr(ptrArr);
+    return 0;
 }
 
 void Destr(Arr* ptrAll) {
     free(ptrAll->arr);
     free(ptrAll);
 }
-
 
 /*
 * �����������: StrNum1 < StrNum2
@@ -107,101 +120,110 @@ void Destr(Arr* ptrAll) {
 �� �������2 � ��� ���� ������� ��, �� ������ �������
 ���������� 2
 */
-int StrComp(Arr* ptrArr, int StrNum1, int StrNum2) {
+int StrComp(const Arr* ptrArr, const int StrNum1, const int StrNum2) {
     int col1 = 0, col2 = 0;
+    enum StrCompRes {
+        SAME_STRINGS,
+        FIRST_HIGHER,
+        SECOND_HIGHER
+    };
 
-    while (1) {
-        int Str1 = ptrArr->arr[ptrArr->max_x * StrNum1 + col1];
-        int Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
-        int small1 = 0, small2 = 0;
+    while (col1 < ptrArr->max_x && col2 < ptrArr->max_x) {
+        const int* Str1 = &ptrArr->arr[ptrArr->max_x * StrNum1 + col1];
+        const int* Str2 = &ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
+        int CurrChar1 = *Str1, CurrChar2 = *Str2;
+        bool small1 = 0, small2 = 0;
 
-        if ((Str1 == '"' || Str1 == '(') && col1 == 0) {
-            ++col1;
-            Str1 = ptrArr->arr[ptrArr->max_x * StrNum1 + col1];
-        }
-        if ((Str2 == '"' || Str2 == '(') && col2 == 0) {
-            ++col2;
-            Str2 = ptrArr->arr[ptrArr->max_x * StrNum2 + col2];
-        }
+        SkipNonLetterSign (Str1, &col1, &CurrChar1);
+        SkipNonLetterSign (Str2, &col2, &CurrChar2);
 
+        // нам не важен случай, если обе строчки содержат маленькие или большие буквы
+        // нам важно лишь отношение между этими символами
+        SmallLetterCheck(&CurrChar1, &CurrChar2, &small1, &small2);
 
-        if (Str1 == Str2 - 32) {
-            small2 = 1;
-        }
-        else if (Str2 == Str1 - 32) {
-            small1 = 1;
-        }
+        UpperToLowerCase(&CurrChar1);
+        UpperToLowerCase(&CurrChar2);
 
-        
-        if (rus_a <= Str1 && Str1 <= rus_r) {
-            Str1 -= 32;
-        }
-        else if (!(rus_A <= Str1 && Str1 <= rus_r)) {
-            Str1 = 256;
-        }
+        const int HigherStrNumInt = HigherStrNum(CurrChar1, CurrChar2, &col1, &col2, small1, small2);
 
-        if (rus_a <= Str2 && Str2 <= rus_r) {
-            Str2 -= 32;
-        }
-        else if (!(rus_A <= Str2 && Str2 <= rus_r)) {
-            Str2 = 256;
-        }
-        
-        /* �� ���� ������, �� ������������������ ����� ��������� � ��������� �� ��������
-        if ((int)'�' <= Str1 && Str1 <= (int)'�') {
-            Str1 -= 32;
-        }
-        else if (!((int)'�' <= Str1 && Str1 <= (int)'�')) {
-            Str1 = 256;
-        }
+        switch (HigherStrNumInt) {
+            case SAME_STRINGS:
+            case FIRST_HIGHER:
+            case SECOND_HIGHER:
+                return HigherStrNumInt;
 
-        if ((int)'�' <= Str2 && Str2 <= (int)'�') {
-            Str2 -= 32;
+            default:
+                break;
         }
-        else if (!((int)'�' <= Str2 && Str2 <= (int)'�')) {
-            Str2 = 256;
-        }
-        */
+    }
+    return UNABLE_TO_COMPARE_STRINGS;
+}
 
-        if (Str1 == Str2 && (small1 == 0 && small2 == 0 || small1 != 0 && small2 != 0)) {
-            if (Str2 == 256) {
-                return 0;
-            }
-            ++col1;
-            ++col2;
+void SkipNonLetterSign (const int* StrPtr, int* col, int* CurrCharPtr) {
+    const unsigned char NonLetterSigns[] = {'"', '(', ' '};
+    for (int i = 0; i < sizeof(NonLetterSigns) / sizeof(unsigned char); ++i) {
+        if (*StrPtr == (int)NonLetterSigns[i]) {
+            ++StrPtr;
+            *col += 1;
+            i = 0;
         }
+    }
+    *CurrCharPtr = *StrPtr;
+}
 
-        if (Str1 < Str2 || Str1 != 256 && Str2 == 256 || small2 == 1) {
-            return 1;
-        }
-
-        if (Str1 > Str2 || Str1 == 256 && Str2 != 256 || small1 == 1) {
-            return 2;
-        }
+void SmallLetterCheck (const int* CurrCharPtr1, const int* CurrCharPtr2, bool* small1, bool* small2) {
+    if (*CurrCharPtr1 == *CurrCharPtr2 - BIG_SMALL_LETTER_DIFFERENCE) {
+        *small2 = 1;
+    }
+    else if (*CurrCharPtr2 == *CurrCharPtr1 - BIG_SMALL_LETTER_DIFFERENCE) {
+        *small1 = 1;
     }
 }
 
-void StrSwap(Arr* ptrArr, int StrNum1, int StrNum2) {
-    int curr_pos = 0, col = 0;
-    int* str = StrCopy(ptrArr, StrNum1);
-
-    while (ptrArr->arr[ptrArr->max_x * StrNum2 + col] != '\n' && col < MAX_X) {
-        ptrArr->arr[ptrArr->max_x * StrNum1 + col] = ptrArr->arr[ptrArr->max_x * StrNum2 + col];
-        ++col;
+void UpperToLowerCase(int* CurrCharPtr) { // ошибка здесь, нужно сделать флаг, помечающий изменённый регистр символа
+    if (rus_a <= *CurrCharPtr && *CurrCharPtr <= rus_r) {
+        *CurrCharPtr -= BIG_SMALL_LETTER_DIFFERENCE;
     }
-    ptrArr->arr[ptrArr->max_x * StrNum1 + col] = '\n';
-
-    while (*(str + curr_pos) != '\n') {
-        ptrArr->arr[ptrArr->max_x * StrNum2 + curr_pos] = *(str + curr_pos);
-        ++curr_pos;
+    else if (!(rus_A <= *CurrCharPtr && *CurrCharPtr <= rus_r)) {
+        *CurrCharPtr = NON_LETTER_SYMBOL;
     }
-    ptrArr->arr[ptrArr->max_x * StrNum2 + curr_pos] = '\n';
+}
+
+int HigherStrNum(const int CurrChar1, const int CurrChar2, int* col1, int* col2,
+    const bool small1, const bool small2) {
+    if (CurrChar1 == CurrChar2 && small1 == 0 && small2 == 0) {
+        if (CurrChar2 == NON_LETTER_SYMBOL) {
+            return 0;
+        }
+        *col1 += 1;
+        *col2 += 1;
+        return -1;
+    }
+
+    if (CurrChar1 < CurrChar2 || CurrChar1 != NON_LETTER_SYMBOL && CurrChar2 == NON_LETTER_SYMBOL || small2 == 1) {
+        return 1;
+    }
+
+    if (CurrChar1 > CurrChar2 || CurrChar1 == NON_LETTER_SYMBOL && CurrChar2 != NON_LETTER_SYMBOL || small1 == 1) {
+        return 2;
+    }
+    return -1;
+}
+
+int StrSwap(Arr* ptrArr, const int StrNum1, const int StrNum2) {
+    int* str = CreateArrStrCopy(ptrArr, StrNum1);
+    if (str == NULL) {
+        return ALLOCATION_ERROR;
+    }
+
+    PasteStrToStr(&ptrArr->arr[ptrArr->max_x * StrNum1], &ptrArr->arr[ptrArr->max_x * StrNum2]);
+    PasteStrToStr(&ptrArr->arr[ptrArr->max_x * StrNum2], str);
 
     free(str);
+    return 0;
 }
 
-void StrProc(Arr* ptrArr, int StrNum1, int StrNum2) {
-
+/*void StrProc(Arr* ptrArr, const int StrNum1, const int StrNum2) {
     if (StrComp(ptrArr, StrNum1, StrNum2) == ZERO) {
         printf("%s", "Same lines");
     }
@@ -212,39 +234,28 @@ void StrProc(Arr* ptrArr, int StrNum1, int StrNum2) {
         StrSwap(ptrArr, StrNum1, StrNum2);
         printf("%s", "Second line is higher");
     }
-}
+}*/
 
-int* StrCopy(Arr* ptrArr, int StrNum) {
+int* CreateArrStrCopy(const Arr* ptrArr, const int StrNum) {
+    assert(!(StrNum < 0 || StrNum >= ptrArr->max_y) && "Allocation error");
 
-    if (StrNum < 0 || StrNum >= ptrArr->max_y) {
-        return NULL;
-    }
-
-    int curr_pos = 0;
-    int* str = (int*)malloc(sizeof(int) * ptrArr->max_x);
+    int* str = malloc(sizeof(int) * ptrArr->max_x);
     if (str == NULL) {
         return NULL;
     }
 
-    while (ptrArr->arr[ptrArr->max_x * StrNum + curr_pos] != '\n' && curr_pos < ptrArr->max_x - 1) {
-        str[curr_pos] = ptrArr->arr[ptrArr->max_x * StrNum + curr_pos];
-        ++curr_pos;
-    }
-    str[curr_pos] = '\n';
-
+    PasteStrToStr(str, &ptrArr->arr[ptrArr->max_x * StrNum]);
     return str;
 }
 
-void StrPaste(Arr* ptrArr, int StrNum, int* str) {
-    int curr_pos = 0;
-    while (str[curr_pos] != '\n' && curr_pos < ptrArr->max_x - 1) {
-        ptrArr->arr[ptrArr->max_x * StrNum + curr_pos] = str[curr_pos];
-        ++curr_pos;
-    }
-    ptrArr->arr[ptrArr->max_x * StrNum + curr_pos] = '\n';
+void StrPasteToArr(const Arr* ptrArr, const int StrNum, const int* str) {
+    PasteStrToStr(&ptrArr->arr[ptrArr->max_x * StrNum], str);
 }
 
-void ErrorProc (int ErrorCode) {
-    printf("%s", ErrorNames[ErrorCode - 1]);
-    exit(ErrorCode - 1);
+void PasteStrToStr(int* StrIntoPaste, const int* StrToPaste) {
+    int curr_pos = 0;
+    for (; StrToPaste[curr_pos] != '\n' && curr_pos < MAX_X - 1; ++curr_pos) {
+        StrIntoPaste[curr_pos] = StrToPaste[curr_pos];
+    }
+    StrIntoPaste[curr_pos] = '\n';
 }

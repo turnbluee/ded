@@ -94,37 +94,46 @@ void ArrInsSort(Arr* ptrArr) {
 */
 
 
-void ArrInsSort(Arr* ptrArr) {
+int ArrInsSort(Arr* ptrArr) {
     for (int StrNumNow = 1; StrNumNow < ptrArr->max_y; ++StrNumNow){
-        int count = 0, StrNumPrev = StrNumNow - 1;
+        int count = 0, StrNumPrev = StrNumNow - 1, HigherStrNumInt = 2;
 
-        while (StrNumPrev >= 0) {
-            int res = StrComp(ptrArr, StrNumPrev, StrNumNow);
-            if (res == 2) {
+        while (StrNumPrev >= 0 && HigherStrNumInt == 2) {
+            HigherStrNumInt = StrComp(ptrArr, StrNumPrev, StrNumNow);
+            switch (HigherStrNumInt) {
+            case 1:
+            case 0:
+            break;
+
+            case 2: {
                 ++count;
                 --StrNumPrev;
-            }
-            else if (res == 1 || res == 0) {
                 break;
+            }
+
+            case UNABLE_TO_COMPARE_STRINGS:
+                return UNABLE_TO_COMPARE_STRINGS;
             }
         }
         ++StrNumPrev;
 
         if (count > 0) {
-            int* StrNow = StrCopy(ptrArr, StrNumNow);
-
-            for (int StrsBehindCurr = 0; StrsBehindCurr < count; ++StrsBehindCurr) {
-                int* StrToPaste = StrCopy(ptrArr, StrNumNow - StrsBehindCurr - 1);
-                StrPaste(ptrArr, StrNumNow - StrsBehindCurr, StrToPaste);
+            int* StrNow = CreateArrStrCopy(ptrArr, StrNumNow);
+            if (StrNow == NULL) {
+                return ALLOCATION_ERROR;
             }
 
-            StrPaste(ptrArr, StrNumNow - count, StrNow);
+            for (int StrsBehindCurr = 0; StrsBehindCurr < count; ++StrsBehindCurr) {
+                const int* StrToPaste = CreateArrStrCopy(ptrArr, StrNumNow - StrsBehindCurr - 1);
+                if (StrToPaste == NULL) {
+                    return ALLOCATION_ERROR;
+                }
+                StrPasteToArr(ptrArr, StrNumNow - StrsBehindCurr, StrToPaste);
+            }
 
+            StrPasteToArr(ptrArr, StrNumNow - count, StrNow);
             free(StrNow);
         }
     }
+    return 0;
 }
-
-// void ArrBubbleSort(Arr* ptrArr) {
-//     for (int counter)
-// }
