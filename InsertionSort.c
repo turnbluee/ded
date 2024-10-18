@@ -97,15 +97,14 @@ void ArrInsSort(Arr* ptrArr) {
 int ArrInsSort(Arr* ptrArr) {
     for (int StrNumNow = 1; StrNumNow < ptrArr->max_y; ++StrNumNow){
         int count = 0, StrNumPrev = StrNumNow - 1, HigherStrNumInt = 2;
-
         while (StrNumPrev >= 0 && HigherStrNumInt == 2) {
             HigherStrNumInt = StrComp(ptrArr, StrNumPrev, StrNumNow);
             switch (HigherStrNumInt) {
-            case 1:
-            case 0:
+            case FIRST_HIGHER:
+            case SAME_STRINGS:
             break;
 
-            case 2: {
+            case SECOND_HIGHER: {
                 ++count;
                 --StrNumPrev;
                 break;

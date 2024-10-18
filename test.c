@@ -1,4 +1,4 @@
-#include "ServFuncHead.h"
+#include "MainHeader.h"
     const char* ErrorNames[] = {
     "Index Out Of Range",
     "Allocation Error",
@@ -21,31 +21,28 @@ int main() {
 
     int res = ArrIn(ptrArr);
     switch (res) {
-        case OPENING_FILE_ERROR:
-            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", OPENING_FILE_ERROR);
-            return OPENING_FILE_ERROR;
-        case READING_FILE_ERROR:
-            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", READING_FILE_ERROR);
-            return READING_FILE_ERROR;
-        default:
+        case 0:
             break;
+        default:
+            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", res);
+            return res;
     }
 
     res = ArrInsSort(ptrArr);
     switch (res) {
-        case ALLOCATION_ERROR:
-            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", ALLOCATION_ERROR);
-            return ALLOCATION_ERROR;
-        default:
+        case 0:
             break;
+        default:
+            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", res);
+        return res;
     }
 
     res = ArrOut(ptrArr);
     switch (res) {
-        case OPENING_FILE_ERROR:
-            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", ALLOCATION_ERROR);
-        return ALLOCATION_ERROR;
-        default:
+        case 0:
             break;
+        default:
+            printf("%s\n%s%i", ErrorNames[res - 1], "Error code: ", res);
+        return res;
     }
 }
