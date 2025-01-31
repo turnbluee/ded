@@ -1,5 +1,5 @@
 #include "ServFuncHead.h"
-
+/*
 void ArrInsSort1(Arr* ptrArr) {
 
     for (int i = 1; i < ptrArr->max_y; ++i) {
@@ -25,7 +25,7 @@ void ArrInsSort1(Arr* ptrArr) {
         }
         j = 0;
 
-        wchar_t* str = (wchar_t*)malloc((ptrArr->max_x + 1) * sizeof(wchar_t));
+        char* str = (char*)malloc((ptrArr->max_x + 1) * sizeof(char));
         while (ptrArr->arr[ptrArr->max_x * i + j] != '\0') {
             *(str + j) = ptrArr->arr[ptrArr->max_x * i + j];
             ++j;
@@ -64,28 +64,76 @@ void ArrInsSort1(Arr* ptrArr) {
 
 void ArrInsSort(Arr* ptrArr) {
     for (int StrNumNow = 1; StrNumNow < ptrArr->max_y; ++StrNumNow){
-        int count = 0, StrNumPrev = StrNumNow - 1, j = 0;
+        int count = 0, StrNumPrev = StrNumNow - 1;
 
         while (StrNumPrev >= 0) {
-            if (StrComp(ptrArr, StrNumPrev, StrNumNow) == 2) {
+            int res = StrComp(ptrArr, StrNumPrev, StrNumNow);
+            if (res == 2) {
                 ++count;
                 --StrNumPrev;
             }
-            else if (StrComp(ptrArr, StrNumPrev, StrNumNow) == 1 ||
-                StrComp(ptrArr, StrNumPrev, StrNumNow) == 0) {
+            else if (res == 1 || res == 0) {
                 break;
             }
         }
         ++StrNumPrev;
 
-        wchar_t* str = StrCopy(ptrArr, StrNumNow);
+        if (count > 0) {
+            int* curr_str = StrCopy(ptrArr, StrNumNow);
 
-        for (int i = 0; i < count; ++i) {
-            StrSwap(ptrArr, StrNumNow - i, StrNumNow - i - 1);
+            for (int StrsBehindCurr = 0; StrsBehindCurr < count; ++StrsBehindCurr) {
+                StrSwap(ptrArr, StrNumNow - StrsBehindCurr, StrNumNow - StrsBehindCurr - 1);
+            }
+
+            StrPaste(ptrArr, StrNumNow, curr_str);
+
+            free(curr_str);
         }
-
-        StrPaste(ptrArr, StrNumPrev, &str);
-
-        free(str);
     }
+}
+*/
+
+
+int ArrInsSort(Arr* ptrArr) {
+    for (int StrNumNow = 1; StrNumNow < ptrArr->max_y; ++StrNumNow){
+        int count = 0, StrNumPrev = StrNumNow - 1, HigherStrNumInt = 2;
+
+        while (StrNumPrev >= 0 && HigherStrNumInt == 2) {
+            HigherStrNumInt = StrComp(ptrArr, StrNumPrev, StrNumNow);
+            switch (HigherStrNumInt) {
+            case 1:
+            case 0:
+            break;
+
+            case 2: {
+                ++count;
+                --StrNumPrev;
+                break;
+            }
+
+            case UNABLE_TO_COMPARE_STRINGS:
+                return UNABLE_TO_COMPARE_STRINGS;
+            }
+        }
+        ++StrNumPrev;
+
+        if (count > 0) {
+            int* StrNow = CreateArrStrCopy(ptrArr, StrNumNow);
+            if (StrNow == NULL) {
+                return ALLOCATION_ERROR;
+            }
+
+            for (int StrsBehindCurr = 0; StrsBehindCurr < count; ++StrsBehindCurr) {
+                const int* StrToPaste = CreateArrStrCopy(ptrArr, StrNumNow - StrsBehindCurr - 1);
+                if (StrToPaste == NULL) {
+                    return ALLOCATION_ERROR;
+                }
+                StrPasteToArr(ptrArr, StrNumNow - StrsBehindCurr, StrToPaste);
+            }
+
+            StrPasteToArr(ptrArr, StrNumNow - count, StrNow);
+            free(StrNow);
+        }
+    }
+    return 0;
 }
