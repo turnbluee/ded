@@ -16,7 +16,8 @@ enum ErrorCodes {
     OPENING_FILE_ERROR,
     WRITING_FILE_ERROR,
     UNABLE_TO_COMPARE_STRINGS,
-    WRONG_STR_SIZE
+    WRONG_STR_SIZE,
+    UNABLE_TO_PROCESS_STRING
 };
 
 extern const char* ErrorNames[];

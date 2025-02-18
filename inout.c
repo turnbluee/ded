@@ -2,6 +2,8 @@
 #include "stdlib.h"
 #include "stdio.h"
 
+const char SkippingSigns[] = {'.', ' ', ',', '-', '"', ':', '('};
+
 Arr* Constr(const int max_x, const int max_y) {
     Arr* ptrArr = malloc(sizeof(Arr));
 
@@ -36,10 +38,10 @@ int ArrOut(Arr* ptrArr) {
     if (out == NULL) {
         return OPENING_FILE_ERROR;
     }
-    printf("%i\0", ptrArr->max_y);
+    printf("str size: %i\n", ptrArr->max_y);
     int curr_num;
     for (int row = 0; row < ptrArr->max_y; ++row) {
-        for (int col = 0; (curr_num = ptrArr->arr[ptrArr->max_x * row + col]) != '\0' && col < MAX_X; ++col) {
+        for (int col = 0; (curr_num = ptrArr->arr[ptrArr->max_x * row + col]) != '\n' && col < MAX_X; ++col) {
             unsigned char curr_char;
             if (curr_num == NON_LETTER_SYMBOL) {
                 curr_char = ' ';
@@ -49,12 +51,15 @@ int ArrOut(Arr* ptrArr) {
             }
             const unsigned char res = fputc(curr_char, out);
             if (res == EOF) {
+                fclose(out);
                 return WRITING_FILE_ERROR;
             }
         }
-        const char res = fputc('\0', out);
-        if (res == EOF) {
-            return WRITING_FILE_ERROR;
+        if (row < ptrArr->max_y - 1) {
+            const char res = fputc('\n', out);
+            if (res == EOF) {
+                return WRITING_FILE_ERROR;
+            }
         }
     }
 
@@ -71,7 +76,7 @@ int ArrIn(Arr* ptrArr) {
     int row = 0, col = 0, curr_char = EOF;
 
     while ((curr_char = getc(in)) != EOF) {
-        if (row == ptrArr->max_y - 1) {
+         if (row == ptrArr->max_y - 1) {
             ArrExt(ptrArr);
             if (ptrArr->arr == NULL) {
                 return ALLOCATION_ERROR;
@@ -93,8 +98,8 @@ int ArrIn(Arr* ptrArr) {
     }
 
     if (feof(in)) {
-        ptrArr->arr[ptrArr->max_x * row + col] = '\0';
-        printf("End of file\0");
+        ptrArr->arr[ptrArr->max_x * row + col] = '\n';
+        printf("End of file\n");
     }
     else if (ferror(in)) {
         return READING_FILE_ERROR;
@@ -111,48 +116,68 @@ void Destr(Arr* ptrAll) {
 }
 
 /*
-* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ: StrNum1 < StrNum2
+* ???????????: StrNum1 < StrNum2
 
-* пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 0
+* ???? ?????????? ??????, ?? ??????????? ???????, ???? ?????? ?????
+?????????? 0
 
-* пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 1
+* ???? ??????? ??????1 ????????? ? ???????2 ? ???????? ?????? ?? ??????1,
+??????? ?? ???????? ????, ??? ?????? ??????2 ??? ??????1 ?????????
+?? ???????2 ? ??? ???? ?????? ??, ?? ?? ?????? ???????
+?????????? 1
 
-* пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1,
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ1 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ2 пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ 2
+* ???? ??????? ??????1 ????????? ? ???????2 ? ???????? ?????? ?? ??????1,
+??????? ?? ???????? ????, ??? ?????? ??????2 ??? ??????1 ?????????
+?? ???????2 ? ??? ???? ??????? ??, ?? ?????? ???????
+?????????? 2
 */
 int StrComp(const Arr* ptrArr, const int StrNum1, const int StrNum2) {
     int col1 = 0, col2 = 0;
-
+    const int* Str1 = &ptrArr->arr[ptrArr->max_x * StrNum1];
+    const int* Str2 = &ptrArr->arr[ptrArr->max_x * StrNum2];
+    //printf("%i %i %i %i\n", 'А', 'Я', 'а', 'я');
     while (col1 < ptrArr->max_x && col2 < ptrArr->max_x) {
-        const int* Str1 = &ptrArr->arr[ptrArr->max_x * StrNum1];
-        const int* Str2 = &ptrArr->arr[ptrArr->max_x * StrNum2];
-        int CurrChar1 = *(Str1 + col1), CurrChar2 = *(Str2 + col2);
+        int CurrChar1 = *(Str1 + col1),
+            CurrChar2 = *(Str2 + col2);
         // int small1 = 0, small2 = 0;
 
-        int NonLetterSign = SkipNonLetterSign(Str1, &col1, &CurrChar1);
-        switch (NonLetterSign) {
-            case(NON_LETTER_SYMBOL):
-                return SECOND_HIGHER;
-            case 0:
+        int NonLetterSign1 = SkipNonLetterSign(Str1, &col1, &CurrChar1);
+        int NonLetterSign2 = SkipNonLetterSign (Str2, &col2, &CurrChar2);
+        switch (NonLetterSign1) {
+            case(UNABLE_TO_PROCESS_STRING):
+                 return UNABLE_TO_PROCESS_STRING;
+            case(NON_LETTER_SYMBOL): {
+                switch (NonLetterSign2) {
+                    case(NON_LETTER_SYMBOL):
+                    case (EMPTY_STR):
+                        return FIRST_HIGHER;
+                    case(0):
+                        return SECOND_HIGHER;
+                }
+            }
+            case(EMPTY_STR): {
+                switch (NonLetterSign2) {
+                    case(NON_LETTER_SYMBOL):
+                    case(0):
+                        return SECOND_HIGHER;
+                    case(EMPTY_STR):
+                        return FIRST_HIGHER;
+                }
+            }
+            case(0): {
+                switch (NonLetterSign2) {
+                    case(NON_LETTER_SYMBOL):
+                    case(EMPTY_STR):
+                        return FIRST_HIGHER;
+                }
+            }
+            default:
                 break;
         }
 
-        NonLetterSign = SkipNonLetterSign (Str2, &col2, &CurrChar2);
-        switch (NonLetterSign) {
-            case(NON_LETTER_SYMBOL):
-                return FIRST_HIGHER;
-            case 0:
-                break;
-        }
 
-        // РЅР°Рј РЅРµ РІР°Р¶РµРЅ СЃР»СѓС‡Р°Р№, РµСЃР»Рё РѕР±Рµ СЃС‚СЂРѕС‡РєРё СЃРѕРґРµСЂР¶Р°С‚ РјР°Р»РµРЅСЊРєРёРµ РёР»Рё Р±РѕР»СЊС€РёРµ Р±СѓРєРІС‹
-        // РЅР°Рј РІР°Р¶РЅРѕ Р»РёС€СЊ РѕС‚РЅРѕС€РµРЅРёРµ РјРµР¶РґСѓ СЌС‚РёРјРё СЃРёРјРІРѕР»Р°РјРё
+        // нам не важен случай, если обе строчки содержат маленькие или большие буквы
+        // нам важно лишь отношение между этими символами
         //SmallLetterCheck(&CurrChar1, &CurrChar2, &small1, &small2);
 
         UpperToLowerCase(&CurrChar1);
@@ -173,21 +198,35 @@ int StrComp(const Arr* ptrArr, const int StrNum1, const int StrNum2) {
 }
 
 int SkipNonLetterSign (const int* StrPtr, int* col, int* CurrCharPtr) {
-    const unsigned char NonLetterSigns[] = {'"', '(', ' '};
-    int counter = 0;
-    for (int i = 0; i < sizeof(NonLetterSigns) / sizeof(unsigned char); ++i) {
-        if (*StrPtr == (int)NonLetterSigns[i]) {
-            ++StrPtr;
-            *col += 1;
-            i = 0;
+    int FoundLetterSign = 0;
+
+    while (*col < MAX_X && FoundLetterSign == 0) {
+        for(int i = 0; i < sizeof(SkippingSigns) / sizeof(char); ++i) {
+            if (*CurrCharPtr == SkippingSigns[i]) {
+                *col += 1;
+                *CurrCharPtr = *(StrPtr + *col);
+                i = 0;
+            }
         }
-        ++counter;
-        if (counter > MAX_X) {
+        if (*CurrCharPtr == '\n') {
+            return EMPTY_STR;
+        }
+        if (('А' <= *CurrCharPtr && *CurrCharPtr <= 'Я') || // Заглавные буквы
+            ('а' <= *CurrCharPtr && *CurrCharPtr <= 'я')) { // Строчные буквы
+            FoundLetterSign = 1;
+            return 0;
+        }
+        else {
             return NON_LETTER_SYMBOL;
+            /**col += 1;
+            *CurrCharPtr = *(StrPtr + *col);*/
         }
+        /*if (FoundLetterSign == 0 && *CurrCharPtr == '\n') {
+            return NON_LETTER_SYMBOL;
+        }*/
     }
-    *CurrCharPtr = *StrPtr;
-    return 0;
+
+    return UNABLE_TO_PROCESS_STRING;
 }
 
 /*void SmallLetterCheck (const int* CurrCharPtr1, const int* CurrCharPtr2, int* small1, int* small2) {
@@ -199,12 +238,10 @@ int SkipNonLetterSign (const int* StrPtr, int* col, int* CurrCharPtr) {
     }
 }*/
 
-void UpperToLowerCase(int* CurrCharPtr) { // РѕС€РёР±РєР° Р·РґРµСЃСЊ, РЅСѓР¶РЅРѕ СЃРґРµР»Р°С‚СЊ С„Р»Р°Рі, РїРѕРјРµС‡Р°СЋС‰РёР№ РёР·РјРµРЅС‘РЅРЅС‹Р№ СЂРµРіРёСЃС‚СЂ СЃРёРјРІРѕР»Р°
-    if (rus_a <= *CurrCharPtr && *CurrCharPtr <= rus_r) {
+void UpperToLowerCase(int* CurrCharPtr) {
+    // ошибка здесь, нужно сделать флаг, помечающий изменённый регистр символа
+    if ('а' <= *CurrCharPtr && *CurrCharPtr <= 'я') {
         *CurrCharPtr -= BIG_SMALL_LETTER_DIFFERENCE;
-    }
-    else if (!(rus_A <= *CurrCharPtr && *CurrCharPtr <= rus_r)) {
-        *CurrCharPtr = NON_LETTER_SYMBOL;
     }
 }
 
@@ -279,19 +316,19 @@ int StrPasteToArr(const Arr* ptrArr, const int StrNum, const int* str) {
 
 int PasteStrToStr(int* StrIntoPaste, const int* StrToPaste) {
     int curr_pos = 0;
-    for (; StrToPaste[curr_pos] != '\0'; ++curr_pos) {
+    for (; StrToPaste[curr_pos] != '\n'; ++curr_pos) {
         if (curr_pos >= MAX_X) {
             return WRONG_STR_SIZE;
         }
         StrIntoPaste[curr_pos] = StrToPaste[curr_pos];
     }
-    StrIntoPaste[curr_pos] = '\0';
+    StrIntoPaste[curr_pos] = '\n';
     return 0;
 }
 
 int GetStrSize (const int* str) {
     int StrSize = 0;
-    for(; str[StrSize] != '\0'; ++StrSize);
+    for(; str[StrSize] != '\n'; ++StrSize);
     if (StrSize >= MAX_X) {
         return WRONG_STR_SIZE;
     }

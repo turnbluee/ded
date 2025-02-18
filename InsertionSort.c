@@ -112,6 +112,9 @@ int ArrInsSort(Arr* ptrArr) {
 
             case UNABLE_TO_COMPARE_STRINGS:
                 return UNABLE_TO_COMPARE_STRINGS;
+
+            case UNABLE_TO_PROCESS_STRING:
+                return UNABLE_TO_PROCESS_STRING;
             }
         }
         ++StrNumPrev;

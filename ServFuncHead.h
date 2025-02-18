@@ -1,16 +1,16 @@
-п»ї#pragma once
+#pragma once
 #define _HEADER_H_
 #define _CRT_SECURE_NO_WARNINGS
-#define EOL 10 // СѓР·РЅР°Р» С‚РѕР»СЊРєРѕ РёСЃС…РѕРґСЏ РёР· РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ, РЅРёРєР°Рє РёРЅР°С‡Рµ РЅРµ СѓРґР°Р»РѕСЃСЊ
+#define EOL 10 // узнал только исходя из отслеживания, никак иначе не удалось
 #define SPACE 32
 #define rus_A 192
 #define rus_R 223
 #define rus_a 224
 #define rus_r 255
 #define NON_LETTER_SYMBOL 256
+#define EMPTY_STR 257
 #define BIG_SMALL_LETTER_DIFFERENCE 32
 #include <stdlib.h>
-#include <locale.h>
 #include <string.h>
 #include <assert.h>
 #include "MainHeader.h"
@@ -18,7 +18,7 @@
 typedef enum StrCompRes {
     SAME_STRINGS,
     FIRST_HIGHER,
-    SECOND_HIGHER
+    SECOND_HIGHER,
 } StrCompRes;
 
 int ArrExt(Arr* ptrArr);

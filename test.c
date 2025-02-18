@@ -1,5 +1,5 @@
 #include "MainHeader.h"
-    const char* ErrorNames[] = {
+const char* ErrorNames[] = {
     "Index Out Of Range",
     "Allocation Error",
     "Reallocation Error",
